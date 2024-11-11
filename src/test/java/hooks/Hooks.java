@@ -1,46 +1,36 @@
-//package hooks;//package hooks;
-//
-//import com.aventstack.extentreports.ExtentReports;
-//import com.aventstack.extentreports.*;
-//
-//import com.aventstack.extentreports.ExtentTest;
-//import io.cucumber.java.After;
-//import io.cucumber.java.Before;
-//import io.cucumber.java.Scenario;
-//import org.openqa.selenium.WebDriver;
-//
-//import java.io.IOException;
-//import java.sql.DriverManager;
-//
-//public class Hooks {
-//
-//    private WebDriver driver;
-//    private ExtentReports extent;
-//    private ExtentTest test;
-//
-//    @Before
-//    public void setUp() {
-//        // Initialize WebDriver
-//        driver = (WebDriver) DriverManager.getDrivers();
-//
-//        // Initialize ExtentReports
-//        ExtentHtmlReporter htmlReporter = new ExtentHtmlReporter("extentReport.html");
-//        extent = new ExtentReports();
-//        extent.attachReporter(htmlReporter);
-//    }
-//
-//    @After
-//    public void tearDown(Scenario scenario) throws IOException {
-//        if (scenario.isFailed()) {
-//            ScreenshotUtil.takeScreenshot(driver, scenario.getName());
-//            test.fail("Scenario failed");
-//        }
-//        else {
-//            ScreenshotUtil.takeScreenshot(driver, scenario.getName()); // Take screenshot even if successful
-//            test.pass("Scenario passed");
-//        }
-//        // Quit the driver after each scenario
-//        driver.quit();
-//    }
-//}
-//
+package hooks;
+
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+import hooks.ExtentManager;
+import hooks.ScreenshotUtil; // Ensure ScreenshotUtil is imported
+
+public class Hooks {
+    WebDriver driver;
+
+    @Before
+    public void setup(Scenario scenario) {
+        driver = new EdgeDriver();
+        ExtentManager.createTest(scenario.getName(), scenario.getId()); // Create a test in ExtentManager with scenario details
+    }
+
+    @After
+    public void tearDown(Scenario scenario) {
+        if (scenario.isFailed()) {
+            // Capture screenshot with specified name
+            String screenshotPath = ScreenshotUtil.captureScreenshot(driver, "Failed_" + scenario.getName());
+            ExtentManager.getTest().fail("Test failed").addScreenCaptureFromPath(screenshotPath);
+        } else {
+            ExtentManager.getTest().pass("Test passed");
+        }
+
+        if (driver != null) {
+            driver.quit();
+        }
+
+        ExtentManager.flush(); // Write to report
+    }
+}

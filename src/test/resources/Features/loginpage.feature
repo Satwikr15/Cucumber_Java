@@ -24,7 +24,7 @@ Feature: Login Functionality for Opencart E-commerce Website
     Examples:
       | username          | password        | error_message                                        |
       | invalid@gmail.com | invalidpassword | Warning:No match for E-mail address and/or password. |
-    |abbccc             |validpassword    | Warning:No match for E-mail address and/or password. |
+      |abbccc             |   validpassword | Warning:No match for E-mail address and/or password. |
 
   Scenario: Navigating to the forgotten password page
     When I click on the "Forgotten Password" link
